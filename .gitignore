@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+
+# large files
+artifacts
+dataset
 # Distribution / packaging
 .Python
 logs
