@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 
 # Importing constants and custom exceptions from the src module
-from src import constants
+from src.constants import *
 from src.exception.exception import CreditFraudException
 from src.logger.logging import logging
 
@@ -29,9 +29,9 @@ class DataIngestionConfig:
             self.dataset_dir = os.path.join(data_ingestion_dir, "dataset")
             
             # Define paths for training, testing, and raw datasets using constants
-            self.train_path = os.path.join(self.dataset_dir, constants.TRAIN_FILE)
-            self.test_path = os.path.join(self.dataset_dir, constants.TEST_FILE)
-            self.raw_path = os.path.join(self.dataset_dir, constants.RAW_FILE)
+            self.train_path = os.path.join(self.dataset_dir, TRAIN_FILE)
+            self.test_path = os.path.join(self.dataset_dir, TEST_FILE)
+            self.raw_path = os.path.join(self.dataset_dir, RAW_FILE)
 
         except Exception as e:
             # Raise a custom exception if any error occurs during initialization
