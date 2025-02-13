@@ -48,15 +48,20 @@ class Data_Ingestion:
         """
         try:
             # Read the input dataset from a CSV file
-            df = pd.read_csv(f"{os.path.join(os.getcwd())}/dataset/fraudTrain.csv")
+            df = pd.read_csv(f"{os.path.join(os.getcwd())}/dataset/CreditCardData.csv")
             logging.info("Read the input dataset")
+
+            df.drop(columns=['Unnamed: 0.1', 'Unnamed: 0'], axis=1, inplace=True)
+            df.reset_index(drop=True, inplace=True)
+
+            
             
             # Split the dataset into training and testing sets
             train_data, test_data = train_test_split(df, test_size=TEST_SIZE, random_state=RANDOM_STATE)
             logging.info("Performed split operation for train and test dataset")
 
             # Create the directory for data ingestion if it doesn't exist
-            os.makedirs(self.data_ingestion_config.dataset_dir, exist_ok=True)
+            os.makedirs(self.data_ingestion_config.data_ingestion_dir, exist_ok=True)
             logging.info("Created the folder for data ingestion")
 
             # Save the raw, training, and testing datasets to their respective paths
@@ -64,11 +69,14 @@ class Data_Ingestion:
             train_data.to_csv(self.data_ingestion_config.train_path, index=False, header=True)
             test_data.to_csv(self.data_ingestion_config.test_path, index=False, header=True)
             logging.info("Saved the train and test datasets")
-
+            
+            data_ingestion_artifact = DataIngestionArtifact(
+                train_path=self.data_ingestion_config.train_path,
+                test_path=self.data_ingestion_config.test_path,
+                raw_path=self.data_ingestion_config.raw_path
+            )
             # Return the paths of the saved datasets
-            return (self.data_ingestion_config.train_path,
-                    self.data_ingestion_config.test_path,
-                    self.data_ingestion_config.raw_path)
+            return data_ingestion_artifact
 
         except Exception as e:
             # Raise a custom exception if any error occurs during data ingestion

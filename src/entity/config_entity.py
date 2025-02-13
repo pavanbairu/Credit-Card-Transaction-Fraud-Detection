@@ -23,16 +23,31 @@ class DataIngestionConfig:
             self.training_pipeline_config = TrainingPipelineConfig()
             
             # Create the data ingestion directory path
-            data_ingestion_dir = os.path.join(self.training_pipeline_config.artifact_dir, "data_ingestion")
-            
-            # Define the dataset directory path
-            self.dataset_dir = os.path.join(data_ingestion_dir, "dataset")
+            self.data_ingestion_dir = os.path.join(self.training_pipeline_config.artifact_dir, "data_ingestion")
             
             # Define paths for training, testing, and raw datasets using constants
-            self.train_path = os.path.join(self.dataset_dir, TRAIN_FILE)
-            self.test_path = os.path.join(self.dataset_dir, TEST_FILE)
-            self.raw_path = os.path.join(self.dataset_dir, RAW_FILE)
+            self.train_path = os.path.join(self.data_ingestion_dir, TRAIN_FILE)
+            self.test_path = os.path.join(self.data_ingestion_dir, TEST_FILE)
+            self.raw_path = os.path.join(self.data_ingestion_dir, RAW_FILE)
 
+        except Exception as e:
+            # Raise a custom exception if any error occurs during initialization
+            raise CreditFraudException(e, sys)
+        
+
+
+class DataValidationConfig:
+    
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
+        try:
+            self.data_validation_dir = os.path.join(training_pipeline_config.artifact_dir, "data validation")
+            self.valid_dir = os.path.join(self.data_validation_dir, "valid")
+            self.in_valid_dir = os.path.join(self.data_validation_dir, "invalid")
+            self.validation_train_path = os.path.join(self.valid_dir, TRAIN_FILE)
+            self.valid_test_path = os.path.join(self.valid_dir, TEST_FILE)
+            self.invalid_train_path = os.path.join(self.in_valid_dir, TRAIN_FILE)
+            self.invalid_test_path = os.path.join(self.in_valid_dir, TEST_FILE)
+            self.report = os.path.join(self.data_validation_dir, "report.yml")
         except Exception as e:
             # Raise a custom exception if any error occurs during initialization
             raise CreditFraudException(e, sys)
