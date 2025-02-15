@@ -13,14 +13,14 @@ class TrainingPipelineConfig:
         # Get the current timestamp in the format "month_day_year_hour_minute"
         time = datetime.now().strftime("%m_%d_%Y_%H_%M")
         # Define the artifact directory path using the current timestamp
-        self.artifact_dir = os.path.join("artifacts", time)
+        self.artifact_dir = os.path.join("artifacts")
 
 # Class to configure data ingestion settings
 class DataIngestionConfig:
-    def __init__(self):
+    def __init__(self, training_pipeline_config:TrainingPipelineConfig):
         try:
             # Initialize the training pipeline configuration
-            self.training_pipeline_config = TrainingPipelineConfig()
+            self.training_pipeline_config = training_pipeline_config
             
             # Create the data ingestion directory path
             self.data_ingestion_dir = os.path.join(self.training_pipeline_config.artifact_dir, "data_ingestion")
@@ -53,9 +53,9 @@ class DataValidationConfig:
             raise CreditFraudException(e, sys)
         
 class DataTransformationConfig:
-    def __init__(self, training_pipeline: TrainingPipelineConfig):
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
 
-        self.data_transformation_dir = os.path.join(training_pipeline.artifact_dir, "data transformation")
+        self.data_transformation_dir = os.path.join(training_pipeline_config.artifact_dir, "data transformation")
         self.transformed_train_path = os.path.join(self.data_transformation_dir, "transformed_train.npy")
         self.transformed_test_path = os.path.join(self.data_transformation_dir, "transformed_test.npy")
         self.preprocesssor_path = os.path.join(self.data_transformation_dir, "preporcessor.pkl")
@@ -63,9 +63,9 @@ class DataTransformationConfig:
 
        
 class ModelTrainerConfig:
-    def __init__(self, training_pipeline: TrainingPipelineConfig):
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
 
-        self.model_trainer_dir = os.path.join(training_pipeline.artifact_dir, "model trainer")
+        self.model_trainer_dir = os.path.join(training_pipeline_config.artifact_dir, "model trainer")
         self.model_path = os.path.join(self.model_trainer_dir, "model.pkl")
 
         

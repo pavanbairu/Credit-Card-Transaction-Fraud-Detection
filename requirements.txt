@@ -6,4 +6,6 @@ pymongo
 pyyaml
 python-box
 imblearn
+fastapi
+uvicorn
 -e .

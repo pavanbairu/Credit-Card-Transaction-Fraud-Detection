@@ -17,11 +17,12 @@ from sklearn.linear_model import LogisticRegression
 
 
 class ModelTrainer:
-    def __init__(self, model_trainer_config: ModelTrainerConfig,
-                 data_transformation_artifact: DataTransformationArtifact):
+    def __init__(self, data_transformer_artifact: DataTransformationArtifact,
+                 model_trainer_config: ModelTrainerConfig
+                 ):
         
         self.model_trainer_config=model_trainer_config
-        self.data_transformation_artifact=data_transformation_artifact
+        self.data_transformer_artifact=data_transformer_artifact
 
     def train_model(self, X_train, y_train):
 
@@ -33,8 +34,8 @@ class ModelTrainer:
 
     def initiate_model_trainer(self):
 
-        train_data = load_numpy_array(self.data_transformation_artifact.transformed_train_path)
-        test_data = load_numpy_array(self.data_transformation_artifact.transformed_test_path)
+        train_data = load_numpy_array(self.data_transformer_artifact.transformed_train_path)
+        test_data = load_numpy_array(self.data_transformer_artifact.transformed_test_path)
 
         X_train, y_train = train_data[:,:-1], train_data[:,-1]
         X_test, y_test = test_data[:,:-1], test_data[:,-1]
@@ -55,5 +56,5 @@ class ModelTrainer:
             train_metrics=train_metrics,
             test_metrics=test_metrics
         )
-        print(model_trainer_artifact)
+
         return model_trainer_artifact

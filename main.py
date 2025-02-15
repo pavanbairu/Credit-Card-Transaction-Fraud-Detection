@@ -1,5 +1,5 @@
 import sys
-from src.components.data_ingestion import Data_Ingestion 
+from src.components.data_ingestion import DataIngestion 
 from src.components.data_transformation import DataTransformation
 from src.components.model_training import ModelTrainer
 from src.exception.exception import CreditFraudException
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     try:
 
         training_pipeline_config = TrainingPipelineConfig()
-        data_ingestion = Data_Ingestion()
+        data_ingestion = DataIngestion()
         data_ingestion_artifact = data_ingestion.initiate_data_ingestion()     
 
         data_validation_config = DataValidationConfig(training_pipeline_config)

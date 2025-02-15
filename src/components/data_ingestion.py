@@ -16,8 +16,8 @@ from src.entity.artifact_entity import DataIngestionArtifact
 from src.entity.config_entity import DataIngestionConfig
 
 # Class for handling data ingestion processes
-class Data_Ingestion:
-    def __init__(self):
+class DataIngestion:
+    def __init__(self, data_ingestion_config:DataIngestionConfig):
         """
         Initializes the Data_Ingestion class and sets up the data ingestion configuration.
         Logs the start of the data ingestion process.
@@ -27,7 +27,7 @@ class Data_Ingestion:
             # Log the start of the data ingestion process
             logging.info(f"{'> ' * 10} Data Ingestion {' <' * 10}")
             # Initialize the data ingestion configuration
-            self.data_ingestion_config = DataIngestionConfig()
+            self.data_ingestion_config = data_ingestion_config
 
         except Exception as e:
             # Raise a custom exception if any error occurs during initialization

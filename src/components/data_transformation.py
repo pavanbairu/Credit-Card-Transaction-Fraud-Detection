@@ -2,6 +2,10 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import warnings
+
+# Ignore all warnings
+warnings.filterwarnings("ignore")
 
 from src.exception.exception import CreditFraudException
 from src.logger import logging
