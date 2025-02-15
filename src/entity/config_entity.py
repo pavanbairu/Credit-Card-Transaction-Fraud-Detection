@@ -51,3 +51,11 @@ class DataValidationConfig:
         except Exception as e:
             # Raise a custom exception if any error occurs during initialization
             raise CreditFraudException(e, sys)
+        
+class DataTransformationConfig:
+    def __init__(self, training_pipeline: TrainingPipelineConfig):
+
+        self.data_transformation_dir = os.path.join(training_pipeline.artifact_dir, "data transformation")
+        self.transformed_train_path = os.path.join(self.data_transformation_dir, "transformed_train.npy")
+        self.transformed_test_path = os.path.join(self.data_transformation_dir, "transformed_test.npy")
+        self.preprocesssor_path = os.path.join(self.data_transformation_dir, "preporcessor.pkl")

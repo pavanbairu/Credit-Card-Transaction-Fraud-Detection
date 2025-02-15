@@ -15,3 +15,8 @@ class DataValidationArtifact:
     invalid_train_path: Path
     invalid_test_path: Path
     validation_status: Path
+
+@dataclass
+class DataTransformationArtifact:
+    transformed_train_path: Path
+    transformed_test_path: Path

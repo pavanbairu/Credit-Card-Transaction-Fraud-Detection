@@ -4,4 +4,6 @@ scikit-learn
 python-dotenv
 pymongo
 pyyaml
+python-box
+imblearn
 -e .
