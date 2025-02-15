@@ -59,3 +59,13 @@ class DataTransformationConfig:
         self.transformed_train_path = os.path.join(self.data_transformation_dir, "transformed_train.npy")
         self.transformed_test_path = os.path.join(self.data_transformation_dir, "transformed_test.npy")
         self.preprocesssor_path = os.path.join(self.data_transformation_dir, "preporcessor.pkl")
+
+
+       
+class ModelTrainerConfig:
+    def __init__(self, training_pipeline: TrainingPipelineConfig):
+
+        self.model_trainer_dir = os.path.join(training_pipeline.artifact_dir, "model trainer")
+        self.model_path = os.path.join(self.model_trainer_dir, "model.pkl")
+
+        

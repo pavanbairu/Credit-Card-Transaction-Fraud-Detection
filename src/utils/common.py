@@ -30,6 +30,26 @@ def save_numpy_array(data: np.array, path: Path):
     # Save NumPy array to file
     with open(path, 'wb') as file:
         np.save(path, data)
+
+
+def load_numpy_array(path: Path):
+    """
+    load a NumPy array to a specified file path.
+
+    Args:
+        path (Path): The file path.
+
+    Returns:
+        None: The function does not return anything.
+    """
+    # Ensure the directory exists
+    dir_name = os.path.dirname(path)
+    os.makedirs(dir_name, exist_ok=True)
+
+    # Save NumPy array to file
+    with open(path, 'rb') as file:
+        return np.load(file)
+    
     
 def save_object(model, path: Path):
     """

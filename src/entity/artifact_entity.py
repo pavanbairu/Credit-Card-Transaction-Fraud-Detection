@@ -21,3 +21,15 @@ class DataTransformationArtifact:
     transformed_test_path: Path
     preprocessor_path: Path
 
+@dataclass
+class ClassificationMetricArtifact:
+    accuracy: float
+    f1_score: float
+    precision_score: float
+    recall_score: float
+
+@dataclass
+class ModelTrainerArtifact:
+    model_path: Path
+    train_metrics: ClassificationMetricArtifact
+    test_metrics: ClassificationMetricArtifact
