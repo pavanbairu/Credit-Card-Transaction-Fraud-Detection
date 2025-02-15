@@ -19,11 +19,10 @@ import numpy as np
 
 class DataTransformation:
 
-    def __init__(self, data_transformation_artifact: DataTransformationArtifact,
+    def __init__(self,
                  data_validation_artifact: DataValidationArtifact,
                  data_transformation_config: DataTransformationConfig):
         
-        self.data_transformation_artifact = data_transformation_artifact
         self.data_validation_artifact = data_validation_artifact
         self.data_transformation_config = data_transformation_config
         self._config = load_yaml(SCHEME_PATH)
@@ -112,9 +111,6 @@ class DataTransformation:
 
         train_data = self.feature_engineering(train_data)
         test_data = self.feature_engineering(test_data)
-
-        print("dataframe columns :\n", train_data.columns)
-        print("scheme columns : \n", self._config.drop_columns)
 
         train_data = self.drop_columns(train_data, self._config.drop_columns)
         test_data = self.drop_columns(test_data, self._config.drop_columns)

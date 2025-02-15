@@ -7,7 +7,6 @@ class DataIngestionArtifact:
     test_path: Path
     raw_path: Path
 
-
 @dataclass
 class DataValidationArtifact:
     valid_train_path: Path
@@ -20,3 +19,5 @@ class DataValidationArtifact:
 class DataTransformationArtifact:
     transformed_train_path: Path
     transformed_test_path: Path
+    preprocessor_path: Path
+
