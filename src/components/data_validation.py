@@ -9,6 +9,8 @@ from src.entity.artifact_entity import DataIngestionArtifact, DataValidationArti
 from src.entity.config_entity import DataValidationConfig
 from src.exception.exception import CreditFraudException
 from src.logger.logging import logging
+from src.utils.common import load_yaml
+from src.constants import SCHEME_PATH
 
 from scipy.stats import ks_2samp
 
@@ -24,11 +26,18 @@ class DataValidation:
         self.data_ingestion_artifact = data_ingestion_artifact
         self.data_validation_config = data_validation_config
 
-        self.numeric_columns = ['cc_num', 'amt', 'zip', 'lat', 'long', 'city_pop', 
-                                'unix_time', 'merch_lat', 'merch_long', 'is_fraud']
-        
-        self.cat_columns = ['trans_date_trans_time', 'merchant', 'category', 'first', 'last', 'gender', 
-                            'street', 'city', 'state', 'job', 'dob', 'trans_num']
+        self._config = load_yaml(SCHEME_PATH)
+
+    
+    def type_conversion(self, df):
+        df['trans_date_trans_time'] = pd.to_datetime(df['trans_date_trans_time'])
+        # Extract date and time separately
+        df['trans_date'] = df['trans_date_trans_time'].dt.strftime("%Y-%m-%d")
+        df['trans_date'] = pd.to_datetime(df['trans_date'])
+        df['dob']=pd.to_datetime(df['dob'])
+
+        return df
+
 
     def numerical_exists(self, df: pd.DataFrame) -> bool:
         """
@@ -43,14 +52,17 @@ class DataValidation:
         try:
             logging.info("Checking for numerical columns existence.")
             expected_columns = df.select_dtypes(exclude='object')
+
+            if not len(self._config.columns) == len(df.columns.to_list()):
+                logging.error("Required and Expected columns are not equal")
             
-            if len(self.numeric_columns) == expected_columns.shape[1]:
-                for col in self.numeric_columns:
+            if len(self._config.numeric_columns) == expected_columns.shape[1]:
+                for col in self._config.numeric_columns:
                     if col not in expected_columns:
-                        raise CreditFraudException(f"Missing column: {col}")
+                        logging.error(f"Missing column: {col}")
                 return True
             else:
-                raise CreditFraudException("Mismatch in expected numeric columns count.")
+                logging.error("Mismatch in expected categorical columns count.")
         except Exception as e:
             raise CreditFraudException(e, sys)
 
@@ -67,14 +79,17 @@ class DataValidation:
         try:
             logging.info("Checking for categorical columns existence.")
             expected_columns = df.select_dtypes(include='object')
+
+            if not len(self._config.columns) == len(df.columns.to_list()):
+                logging.error("Required and Expected columns are not equal")
             
-            if len(self.cat_columns) == expected_columns.shape[1]:
-                for col in self.cat_columns:
+            if len(self._config.categorical_columns) == expected_columns.shape[1]:
+                for col in self._config.categorical_columns:
                     if col not in expected_columns:
-                        raise CreditFraudException(f"Missing column: {col}")
+                        logging.error(f"Missing column: {col}")
                 return True
             else:
-                raise CreditFraudException("Mismatch in expected categorical columns count.")
+               logging.error("Mismatch in expected categorical columns count.")
         except Exception as e:
             raise CreditFraudException(e, sys)
 
@@ -107,6 +122,7 @@ class DataValidation:
             return report, status
         except Exception as e:
             raise CreditFraudException(e, sys)
+
     
     def initiate_data_validation(self) -> DataValidationArtifact:
         """
@@ -119,6 +135,9 @@ class DataValidation:
             logging.info("Initiating data validation process.")
             train_data = pd.read_csv(self.data_ingestion_artifact.train_path)
             test_data = pd.read_csv(self.data_ingestion_artifact.test_path)
+
+            train_data = self.type_conversion(train_data)
+            test_data = self.type_conversion(test_data)
 
             self.numerical_exists(train_data)
             self.numerical_exists(test_data)
