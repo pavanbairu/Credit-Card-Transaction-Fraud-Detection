@@ -4,3 +4,6 @@ TEST_FILE = "test.csv"
 RAW_FILE = "data.csv"
 TEST_SIZE = 0.2
 RANDOM_STATE = 42
+
+
+SCHEME_PATH = "config/scheme.yaml"
