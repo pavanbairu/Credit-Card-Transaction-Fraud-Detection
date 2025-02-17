@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from src.exception.exception import CreditFraudException
-from src.logger import logging
+from src.logger.logging import logging
 from src.constants import *
 from src.entity.artifact_entity import ModelTrainerArtifact, DataTransformationArtifact
 from src.entity.config_entity import ModelTrainerConfig
@@ -14,47 +14,80 @@ from src.utils.classification_metrics import get_classification_scores
 
 from sklearn.linear_model import LogisticRegression
 
-
-
 class ModelTrainer:
+    """
+    Handles the training of a machine learning model.
+    """
     def __init__(self, data_transformer_artifact: DataTransformationArtifact,
-                 model_trainer_config: ModelTrainerConfig
-                 ):
+                 model_trainer_config: ModelTrainerConfig):
+        """
+        Initializes the ModelTrainer class.
         
-        self.model_trainer_config=model_trainer_config
-        self.data_transformer_artifact=data_transformer_artifact
+        Args:
+            data_transformer_artifact (DataTransformationArtifact): Data transformation artifact containing paths to transformed data.
+            model_trainer_config (ModelTrainerConfig): Configuration entity for model training.
+        """
+        self.model_trainer_config = model_trainer_config
+        self.data_transformer_artifact = data_transformer_artifact
+        logging.info("ModelTrainer initialized successfully.")
 
     def train_model(self, X_train, y_train):
+        """
+        Trains a Logistic Regression model.
+        
+        Args:
+            X_train (np.ndarray): Training feature set.
+            y_train (np.ndarray): Training labels.
+        
+        Returns:
+            LogisticRegression: Trained logistic regression model.
+        """
+        try:
+            model = LogisticRegression()
+            model.fit(X_train, y_train)
+            logging.info("Model training completed successfully.")
+            return model
+        except Exception as e:
+            logging.error(f"Error in training model: {e}")
+            raise CreditFraudException(e, sys)
 
-        model = LogisticRegression()
-        model.fit(X_train, y_train)
+    def initiate_model_trainer(self) -> ModelTrainerArtifact:
+        """
+        Loads transformed data, trains the model, evaluates it, and saves the trained model.
+        
+        Returns:
+            ModelTrainerArtifact: Contains model path and performance metrics.
+        """
+        try:
+            logging.info("Loading transformed training and testing data.")
+            train_data = load_numpy_array(self.data_transformer_artifact.transformed_train_path)
+            test_data = load_numpy_array(self.data_transformer_artifact.transformed_test_path)
 
-        return model
+            X_train, y_train = train_data[:, :-1], train_data[:, -1]
+            X_test, y_test = test_data[:, :-1], test_data[:, -1]
 
+            logging.info("Starting model training.")
+            model = self.train_model(X_train, y_train)
 
-    def initiate_model_trainer(self):
+            logging.info("Evaluating model performance.")
+            y_train_pred = model.predict(X_train)
+            train_metrics = get_classification_scores(y_train, y_train_pred)
 
-        train_data = load_numpy_array(self.data_transformer_artifact.transformed_train_path)
-        test_data = load_numpy_array(self.data_transformer_artifact.transformed_test_path)
+            y_test_pred = model.predict(X_test)
+            test_metrics = get_classification_scores(y_test, y_test_pred)
 
-        X_train, y_train = train_data[:,:-1], train_data[:,-1]
-        X_test, y_test = test_data[:,:-1], test_data[:,-1]
+            os.makedirs(self.model_trainer_config.model_trainer_dir, exist_ok=True)
+            save_object(model, self.model_trainer_config.model_path)
+            logging.info("Model saved successfully.")
 
-        model = self.train_model(X_train, y_train)
+            model_trainer_artifact = ModelTrainerArtifact(
+                self.model_trainer_config.model_path,
+                train_metrics=train_metrics,
+                test_metrics=test_metrics
+            )
 
-        y_train_pred = model.predict(X_train)
-        train_metrics = get_classification_scores(y_train, y_train_pred)
-
-        y_test_pred = model.predict(X_test)
-        test_metrics = get_classification_scores(y_test, y_test_pred)
-
-        os.makedirs(self.model_trainer_config.model_trainer_dir, exist_ok=True)
-        save_object(model, self.model_trainer_config.model_path)
-
-        model_trainer_artifact = ModelTrainerArtifact(
-            self.model_trainer_config.model_path,
-            train_metrics=train_metrics,
-            test_metrics=test_metrics
-        )
-
-        return model_trainer_artifact
+            logging.info("Model training process completed successfully.")
+            return model_trainer_artifact
+        except Exception as e:
+            logging.error(f"Error in model training process: {e}")
+            raise CreditFraudException(e, sys)
