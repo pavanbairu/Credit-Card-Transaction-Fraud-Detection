@@ -78,6 +78,7 @@ class ModelTrainer:
 
             os.makedirs(self.model_trainer_config.model_trainer_dir, exist_ok=True)
             save_object(model, self.model_trainer_config.model_path)
+            save_object(model, FINAL_MODEL_PATH)
             logging.info("Model saved successfully.")
 
             model_trainer_artifact = ModelTrainerArtifact(

@@ -28,16 +28,6 @@ class DataValidation:
 
         self._config = load_yaml(SCHEME_PATH)
 
-    
-    def type_conversion(self, df):
-        df['trans_date_trans_time'] = pd.to_datetime(df['trans_date_trans_time'])
-        # Extract date and time separately
-        df['trans_date'] = df['trans_date_trans_time'].dt.strftime("%Y-%m-%d")
-        df['trans_date'] = pd.to_datetime(df['trans_date'])
-        df['dob']=pd.to_datetime(df['dob'])
-
-        return df
-
 
     def numerical_exists(self, df: pd.DataFrame) -> bool:
         """
@@ -53,16 +43,17 @@ class DataValidation:
             logging.info("Checking for numerical columns existence.")
             expected_columns = df.select_dtypes(exclude='object')
 
-            if not len(self._config.columns) == len(df.columns.to_list()):
+            if len(self._config.columns) != len(df.columns.to_list()):
                 logging.error("Required and Expected columns are not equal")
             
             if len(self._config.numeric_columns) == expected_columns.shape[1]:
                 for col in self._config.numeric_columns:
                     if col not in expected_columns:
                         logging.error(f"Missing column: {col}")
+                        return False
                 return True
             else:
-                logging.error("Mismatch in expected categorical columns count.")
+                logging.error("Mismatch in expected numerical columns count.")
         except Exception as e:
             raise CreditFraudException(e, sys)
 
@@ -80,13 +71,14 @@ class DataValidation:
             logging.info("Checking for categorical columns existence.")
             expected_columns = df.select_dtypes(include='object')
 
-            if not len(self._config.columns) == len(df.columns.to_list()):
+            if len(self._config.columns) != len(df.columns.to_list()):
                 logging.error("Required and Expected columns are not equal")
             
             if len(self._config.categorical_columns) == expected_columns.shape[1]:
                 for col in self._config.categorical_columns:
                     if col not in expected_columns:
                         logging.error(f"Missing column: {col}")
+                        return False
                 return True
             else:
                logging.error("Mismatch in expected categorical columns count.")
@@ -135,9 +127,6 @@ class DataValidation:
             logging.info("Initiating data validation process.")
             train_data = pd.read_csv(self.data_ingestion_artifact.train_path)
             test_data = pd.read_csv(self.data_ingestion_artifact.test_path)
-
-            train_data = self.type_conversion(train_data)
-            test_data = self.type_conversion(test_data)
 
             self.numerical_exists(train_data)
             self.numerical_exists(test_data)

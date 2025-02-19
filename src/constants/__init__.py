@@ -7,3 +7,7 @@ RANDOM_STATE = 42
 
 
 SCHEME_PATH = "config/scheme.yaml"
+
+FINAL_PREPROCESSOR_PATH = "final-models\preprocessor.pkl"
+FINAL_MODEL_PATH = "final-models\model.pkl"
+PREDICTION_OUTPUT_PATH = "prediction-outputs\prediction.csv"

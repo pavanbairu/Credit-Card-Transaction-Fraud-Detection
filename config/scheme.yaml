@@ -24,22 +24,20 @@ columns:
 
 
 numeric_columns:
-  - trans_date_trans_time
   - cc_num
   - amt
   - zip
   - lat
   - long
   - city_pop
-  - dob
   - unix_time
   - merch_lat
   - merch_long
   - is_fraud
-  - trans_date
 
 
 categorical_columns:
+  - trans_date_trans_time
   - merchant
   - category
   - first
@@ -49,6 +47,7 @@ categorical_columns:
   - city
   - state
   - job
+  - dob
   - trans_num
 
 

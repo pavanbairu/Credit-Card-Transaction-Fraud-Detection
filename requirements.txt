@@ -8,4 +8,7 @@ python-box
 imblearn
 fastapi
 uvicorn
+category_encoders
+jinja2
+python-multipart
 -e .
