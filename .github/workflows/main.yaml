@@ -1,60 +1,64 @@
 on:
   push:
     branches:
-      - main
+      - main  # Trigger workflow only on pushes to the main branch
     paths-ignore:
-      - README.md
+      - README.md  # Ignore changes to README.md to prevent unnecessary runs
 
 jobs:
   integration:
     name: Continuous Integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use latest Ubuntu runner
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Fetch the repository code
 
       - name: Linting code
-        run: echo "Linting the code"
+        run: echo "Linting the code"  # Placeholder for actual linting command
 
       - name: Unit testing
-        run: echo "running unit test cases"
+        run: echo "running unit test cases"  # Placeholder for actual unit tests
 
   build-push-image:
-    name: Continous Delivery
-    needs: integration
-    runs-on: ubuntu-latest
+    name: Continuous Delivery
+    needs: integration  # Ensure CI job completes before running CD job
+    runs-on: ubuntu-latest  # Use latest Ubuntu runner
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Fetch the repository code
 
       - name: Install the Utilities
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq unzip
+          sudo apt-get update  # Update package lists
+          sudo apt-get install -y jq unzip  # Install necessary utilities
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_REGION }}
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS access key
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS secret key
+            aws-region: ${{ secrets.AWS_REGION }}  # AWS region
 
       - name: AWS ECR Login
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v1  # Log in to AWS ECR
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-          IMAGE_TAG: latest
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}  # Retrieve ECR registry URL
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}  # Retrieve ECR repository name
+          IMAGE_TAG: latest  # Define the image tag
         run: |
-          # Build the Docker container and push it to ECR for ECS deployment
+          # Build the Docker image
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          
+          # Push the image to Amazon ECR
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
+          # Set the output variable with the image URL
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           
   # Continuous Deployment job to pull the image and deploy it

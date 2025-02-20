@@ -4,6 +4,8 @@ import os
 import sys
 from src.logger.logging import logging
 from src.exception.exception import CreditFraudException
+from src.entity.config_entity import DataIngestionConfig
+from src.constants import *
 
 # # Create S3 client
 s3 = boto3.resource("s3")
@@ -29,11 +31,12 @@ def download_data() -> str:
     """
     try:
         logging.info("Starting data download from S3.")
-        zip_download_dir = os.path.join(os.getcwd(), "artifacts", "data_ingestion")
+        
+        zip_download_dir = os.path.join(os.getcwd(), ARTIFACT_DIR, DATA_INGESTION_DIR)
         os.makedirs(zip_download_dir, exist_ok=True)
 
-        zip_file_path = os.path.join(zip_download_dir, "data.zip")
-        download_object(key="CreditCardData.zip", bucket_name="credit-card-fraud-data1", filename=zip_file_path)
+        zip_file_path = os.path.join(zip_download_dir, DOWNLOAD_ZIP)
+        download_object(key=CREDIT_CARD_DATA_ZIP_FILE, bucket_name=AWS_S3_BUCKET_NAME, filename=zip_file_path)
 
         logging.info(f"Data successfully downloaded and stored at {zip_file_path}")
         return zip_file_path
@@ -47,7 +50,7 @@ def extract_zip_file(zip_file_path: str) -> str:
     """
     try:
         logging.info(f"Extracting data from {zip_file_path}")
-        feature_store_path = os.path.join(os.getcwd(), "artifacts", "data_ingestion", "feature_store")
+        feature_store_path = os.path.join(os.getcwd(), ARTIFACT_DIR, DATA_INGESTION_DIR, FEATURE_STORE)
         os.makedirs(feature_store_path, exist_ok=True)
 
         with zipfile.ZipFile(zip_file_path, "r") as zip_ref:

@@ -36,9 +36,10 @@ def train_data():
     try:
         logging.info("Training started")
         training_pipeline = TrainingPipeline()
-        training_pipeline.run_pipeline()
+        artifact = training_pipeline.run_pipeline()
         logging.info("Training completed successfully")
-        return {"message": "Training is successful"}
+        return "Training is successful. Metrics = {}".format(artifact)
+
     except Exception as e:
         logging.error(f"Training failed: {e}")
         return {"error": f"Training failed: {e}"}

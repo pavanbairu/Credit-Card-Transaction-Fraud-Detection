@@ -29,7 +29,6 @@ class ModelTrainer:
         """
         self.model_trainer_config = model_trainer_config
         self.data_transformer_artifact = data_transformer_artifact
-        logging.info("ModelTrainer initialized successfully.")
 
     def train_model(self, X_train, y_train):
         """
@@ -45,7 +44,7 @@ class ModelTrainer:
         try:
             model = LogisticRegression()
             model.fit(X_train, y_train)
-            logging.info("Model training completed successfully.")
+
             return model
         except Exception as e:
             logging.error(f"Error in training model: {e}")
@@ -59,22 +58,23 @@ class ModelTrainer:
             ModelTrainerArtifact: Contains model path and performance metrics.
         """
         try:
-            logging.info("Loading transformed training and testing data.")
+            logging.info(f"{'> '*10} Model Trainer Started {' <'*10}")
             train_data = load_numpy_array(self.data_transformer_artifact.transformed_train_path)
             test_data = load_numpy_array(self.data_transformer_artifact.transformed_test_path)
+            logging.info("Loading transformed training and testing data.")
 
             X_train, y_train = train_data[:, :-1], train_data[:, -1]
             X_test, y_test = test_data[:, :-1], test_data[:, -1]
 
-            logging.info("Starting model training.")
             model = self.train_model(X_train, y_train)
+            logging.info("model training completed.")
 
-            logging.info("Evaluating model performance.")
             y_train_pred = model.predict(X_train)
             train_metrics = get_classification_scores(y_train, y_train_pred)
 
             y_test_pred = model.predict(X_test)
             test_metrics = get_classification_scores(y_test, y_test_pred)
+            logging.info("Evaluating model performance.")
 
             os.makedirs(self.model_trainer_config.model_trainer_dir, exist_ok=True)
             save_object(model, self.model_trainer_config.model_path)
@@ -87,7 +87,7 @@ class ModelTrainer:
                 test_metrics=test_metrics
             )
 
-            logging.info("Model training process completed successfully.")
+            logging.info(f"Model training process completed successfully. {model_trainer_artifact}")
             return model_trainer_artifact
         except Exception as e:
             logging.error(f"Error in model training process: {e}")

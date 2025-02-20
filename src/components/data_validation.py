@@ -40,7 +40,6 @@ class DataValidation:
             bool: True if all numeric columns exist, else raises exception.
         """
         try:
-            logging.info("Checking for numerical columns existence.")
             expected_columns = df.select_dtypes(exclude='object')
 
             if len(self._config.columns) != len(df.columns.to_list()):
@@ -68,7 +67,6 @@ class DataValidation:
             bool: True if all categorical columns exist, else raises exception.
         """
         try:
-            logging.info("Checking for categorical columns existence.")
             expected_columns = df.select_dtypes(include='object')
 
             if len(self._config.columns) != len(df.columns.to_list()):
@@ -124,12 +122,15 @@ class DataValidation:
             DataValidationArtifact: Artifact containing paths and validation status.
         """
         try:
-            logging.info("Initiating data validation process.")
+            logging.info(f"{'> '*10} Data Validation Started {' <'*10}")
             train_data = pd.read_csv(self.data_ingestion_artifact.train_path)
             test_data = pd.read_csv(self.data_ingestion_artifact.test_path)
 
+            logging.info("Checking for numerical Columns for train and test data")
             self.numerical_exists(train_data)
             self.numerical_exists(test_data)
+
+            logging.info("Checking for Categorical Columns for train and test data")
             self.categorical_exists(train_data)
             self.categorical_exists(test_data)
 

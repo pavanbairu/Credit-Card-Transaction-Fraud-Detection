@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import pandas as pd
 import boto3
-import zipfile
 from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
 
@@ -59,7 +58,7 @@ class DataIngestion:
             feature_store_path = extract_zip_file(zip_file_path)
 
             # Step 2: Read extracted dataset
-            dataset_path = os.path.join(feature_store_path, "CreditCardData.csv")  
+            dataset_path = os.path.join(feature_store_path, RAW_FILE)  
             logging.info(f"Reading dataset from {dataset_path}")
             df = pd.read_csv(dataset_path)
 
@@ -77,8 +76,7 @@ class DataIngestion:
             os.makedirs(self.data_ingestion_config.data_ingestion_dir, exist_ok=True)
 
             # Step 6: Save datasets
-            logging.info("Saving raw, train, and test datasets.")
-            df.to_csv(self.data_ingestion_config.raw_path, index=False)
+            logging.info("Saving train and test datasets.")
             train_data.to_csv(self.data_ingestion_config.train_path, index=False)
             test_data.to_csv(self.data_ingestion_config.test_path, index=False)
 
