@@ -12,5 +12,4 @@ category_encoders
 jinja2
 python-multipart
 boto3
-zipfile
 -e .
