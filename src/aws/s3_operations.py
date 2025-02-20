@@ -22,7 +22,7 @@ def download_object(key, bucket_name, filename):
         logging.error("Error in downloading data from S3.")
         raise CreditFraudException(e, sys)
 
-def download_data(self) -> str:
+def download_data() -> str:
     """
     Fetches data from S3 and saves it as a zip file.
     Returns the local path of the downloaded zip file.

@@ -1,0 +1,110 @@
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - README.md
+
+jobs:
+  integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Linting code
+        run: echo "Linting the code"
+
+      - name: Unit testing
+        run: echo "running unit test cases"
+
+  build-push-image:
+    name: Continous Delivery
+    needs: integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install the Utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: AWS ECR Login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: build, tag, push image
+        id: build-image
+        env: 
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: latest
+        run: |
+
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+  # Continuous Deployment job to pull the image and deploy it
+  Continuous-Deployment:
+    needs: build-push-image  # This job depends on the 'build-and-push-ecr-image' job
+    runs-on: self-hosted  # Use a self-hosted runner
+    steps:
+      # Step: 1 to checkout the code from the repository
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Step: 2 Configure AWS credentials using secrets
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step: 3 Login to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Step: 4 Debug AWS credentials (for troubleshooting purposes)
+      - name: Debug AWS credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+          echo "AWS_REGION: ${{ secrets.AWS_REGION }}"
+          echo "AWS_ECR_LOGIN_URI: ${{ secrets.AWS_ECR_LOGIN_URI }}"
+
+      # Step: 5 to pull the latest image from ECR
+      - name: Pull latest images
+        run: |
+          docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+
+      # Step: 6 Stop and remove the existing container if it exists
+      - name: Stop and remove existing container (if exists)
+        run: |
+          docker ps -q --filter "name=creditcard_fraud_detection" | xargs -r docker stop || true
+          docker ps -a -q --filter "name=creditcard_fraud_detection" | xargs -r docker rm -fv || true
+
+      # Step: 7 Run the Docker container to serve the users (Expose it on port 8000)
+      - name: Run Docker Image to serve users
+        run: |
+          docker run -d -p 8000:8000 --ipc="host" --name=creditcard_fraud_detection \
+            -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' \
+            -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
+            -e 'AWS_REGION=${{ secrets.AWS_REGION }}' \
+            ${{steps.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+
+      # Step: 8 Clean up previous images and containers to free up space
+      - name: Clean previous images and containers
+        run: |
+          docker system prune -f
