@@ -45,16 +45,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: build, tag, push image
+      - name: Build, tag, and push image to Amazon ECR
         id: build-image
-        env: 
+        env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: latest
         run: |
-
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # Build the Docker container and push it to ECR for ECS deployment
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          
   # Continuous Deployment job to pull the image and deploy it
   Continuous-Deployment:
     needs: build-push-image  # This job depends on the 'build-and-push-ecr-image' job
@@ -102,7 +104,7 @@ jobs:
             -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' \
             -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
             -e 'AWS_REGION=${{ secrets.AWS_REGION }}' \
-            ${{steps.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+            ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
       # Step: 8 Clean up previous images and containers to free up space
       - name: Clean previous images and containers
