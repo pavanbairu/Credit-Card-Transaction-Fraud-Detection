@@ -11,9 +11,9 @@ TARGET = "is_fraud"
 
 SCHEME_PATH = "config/scheme.yaml"
 
-FINAL_PREPROCESSOR_PATH = os.path.join(os.getcwd(),"final-models\preprocessor.pkl")
-FINAL_MODEL_PATH = os.path.join(os.getcwd(),"final-models\model.pkl")
-PREDICTION_OUTPUT_PATH = os.path.join(os.getcwd(),"prediction-outputs\prediction.csv")
+FINAL_PREPROCESSOR_PATH = os.path.join(os.getcwd(),"final-models","preprocessor.pkl")
+FINAL_MODEL_PATH = os.path.join(os.getcwd(),"final-models","model.pkl")
+PREDICTION_OUTPUT_PATH = os.path.join(os.getcwd(),"prediction-outputs","prediction.csv")
 
 """
 data ingestion
