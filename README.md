@@ -148,3 +148,6 @@ export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
    - AWS_REGION
    - ECR_REPOPOSITORY_NAME
    - AWS_ECR_LOGIN_URI
+
+# 8. Test Results:
+   - **Results**: [Credit Card Fraud Transactions Test Results](https://docs.google.com/document/d/1R6_Asbcu3vFcCamqLcztgYADFS-Cog7E/edit?usp=sharing&ouid=112712433898620640491&rtpof=true&sd=true)
