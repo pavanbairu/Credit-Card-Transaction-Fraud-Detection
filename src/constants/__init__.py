@@ -2,7 +2,7 @@
 ARTIFACT_DIR = "artifacts"
 TRAIN_FILE = "train.csv"
 TEST_FILE = "test.csv"
-RAW_FILE = "data.csv"
+RAW_FILE = "CreditCardData.csv"
 TARGET = "is_fraud"
 
 
