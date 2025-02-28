@@ -28,7 +28,7 @@ class DataIngestion:
         Raises CreditFraudException if an error occurs.
         """
         try:
-            logging.info(f"{'> ' * 10} Data Ingestion Started {' <' * 10}")
+            logging.info(f"{'> ' * 10} Data Ingestion Started. {' <' * 10}")
             self.data_ingestion_config = data_ingestion_config
         except Exception as e:
             logging.error("Error in initializing DataIngestion class.")

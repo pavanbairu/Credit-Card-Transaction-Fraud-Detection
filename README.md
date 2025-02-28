@@ -1,7 +1,7 @@
 # Credit-Card-Transaction-Fraud-Detection
 
 ## Problem Statement
-Credit card fraud is a significant financial threat. This project focuses on identifying fraudulent transactions using machine learning techniques on a simulated dataset.
+Credit card fraud is a significant financial threat. This project focuses on identifying fraudulent transactions using machine learning techniques on a simulated dataset.  its a imbalanced dataset
 
 ## Dataset Overview
 - **Source**: [Kaggle](https://www.kaggle.com/datasets/kartik2112/fraud-detection/data) (Simulated transactions using Sparkov Data Generation)
